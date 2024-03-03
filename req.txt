@@ -1,0 +1,6 @@
+pandas
+seaborn
+scikit-learn
+lightgbm==3.3.0
+streamlit==1.11.1
+altair==4.0
