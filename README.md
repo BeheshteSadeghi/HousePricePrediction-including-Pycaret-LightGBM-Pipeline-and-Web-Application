@@ -1,6 +1,20 @@
-# Tehran Housing Listing Price Estimator
+# Tehran Home Listing Price Estimator
 
-A LightGBM regression project with a Streamlit interface. Estimate an asking price using floor area, neighborhood, rooms, and amenities.
+Fits a LightGBM model to historical Tehran listings and presents an interactive property estimator.
+
+[Run the project](#quick-start) · [Verification](#verification) · [Files](#repository-map)
+
+| | |
+| --- | --- |
+| Stack | LightGBM · Streamlit · scikit-learn |
+| Entry point | [`pricing.py`](pricing.py) |
+| Focus | real-estate · lightgbm · streamlit · regression |
+
+## How it works
+
+`Listings → clean features → fit on log prices → holdout evaluation → Streamlit demo`
+
+## Quick start
 
 ```sh
 python -m pip install -r req.txt
@@ -14,6 +28,19 @@ The [listing dataset](housePrice.csv) was collected from Divar. The target is th
 
 [Exploration and model comparison](HousePricePrediciton_final.ipynb) · [Original preprocessing pipeline](PipelineModel.ipynb)
 
-## Example result
+## Verification
 
-In the bundled holdout, median absolute error was about **632 million** for LightGBM and **2.0 billion** for the training-median baseline, in the source price units.
+Median absolute error was about 632 million for LightGBM versus 2.0 billion for the training-median baseline in the supplied price units.
+
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| [`pricing.py`](pricing.py) | Estimator and benchmark |
+| [`webApp.py`](webApp.py) | Interactive UI |
+| [`housePrice.csv`](housePrice.csv) | Listing data |
+| [`PipelineModel.ipynb`](PipelineModel.ipynb) | Earlier pipeline study |
+
+## Scope
+
+The data describes asking prices from a historical snapshot. The split is random and does not measure transfer to a new period.
