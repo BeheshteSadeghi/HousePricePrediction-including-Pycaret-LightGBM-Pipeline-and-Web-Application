@@ -1,48 +1,34 @@
-import streamlit as st
-import numpy as np
 import pandas as pd
-import joblib
+import streamlit as st
 
-model = joblib.load('finalized_pipe_model.joblib')
+from pricing import FEATURES, fit_estimator, load_data
 
-# Address,Area,Parking,Elevator,Warehouse
-Columns = [ "Area", "Room", "Parking", "Warehouse", 'Elevator',"Address"]
-df = pd.read_csv('housePrice.csv')
-address = df.Address.unique()
-Address = st.selectbox("Address", address)
-Area = st.number_input("Area",30,20000000000)
-Room = st.number_input("Number of rooms", 0,5)
-Parking = st.radio("Parking", ["Yes","No"]) == "Yes"
-Elevator = st.radio("Elevator", ["Yes","No"]) == "Yes"
-Warehouse = st.radio("Warehouse", ["Yes","No"]) == "Yes"
 
-##-------------- 1st method for creating "output" array------------------------------
-#final_vec = [Area, Room, Parking, Warehouse, Elevator, Address]
-#output = {i: v for i, v in zip(Columns, final_vec)}
+@st.cache_resource
+def trained_estimator():
+    frame = load_data()
+    return fit_estimator(frame[FEATURES], frame['Price']), sorted(frame['Address'].unique())
 
-##-------------- 2nd method for creating "output" array------------------------------
-#output = {'Area':[Area], 'Room':[Room], 'Parking':[Parking], 'Warehouse':[Warehouse], 'Elevator':[Elevator], 'Address':Address}
 
-##-------------- 3rd method for creating "output" array------------------------------
-#output = {'Area': 100000, 'Room': 3, 'Parking': 1, 'Warehouse': 1, 'Elevator': 0, 'Address': ['Darakeh']}
+def main():
+    st.set_page_config(page_title='Tehran Listing Price Estimator', layout='centered')
+    st.title('Tehran listing price estimator')
+    st.write('Explore estimated asking prices from the repository’s historical listing sample.')
+    model, neighborhoods = trained_estimator()
+    with st.form('listing'):
+        address = st.selectbox('Neighborhood', neighborhoods)
+        left, right = st.columns(2)
+        area = left.number_input('Area (m²)', 10, 2000, 80)
+        rooms = right.number_input('Rooms', 0, 10, 2)
+        parking = st.checkbox('Parking')
+        warehouse = st.checkbox('Storage')
+        elevator = st.checkbox('Elevator')
+        submitted = st.form_submit_button('Estimate price')
+    if submitted:
+        listing = pd.DataFrame([[area, rooms, parking, warehouse, elevator, address]], columns=FEATURES)
+        st.metric('Estimated asking price', f'{model.predict(listing)[0]:,.0f}')
+        st.caption('The estimate uses the original units of the dataset’s Price column.')
 
-##-------------- 4th method for creating "output" array------------------------------
-#output = {'Area':[Area], 'Room':[Room], 'Parking':[Parking], 'Warehouse':[Warehouse], 'Elevator':[Elevator]}
-#output['Address'] = pd.Series(Address)
 
-##-------------- 5th method for creating "output" array------------------------------
-output = {'Area':[Area], 'Room':[Room], 'Parking':[Parking],'Warehouse':[Warehouse], 'Elevator':[Elevator], 'Address':[Address]}
-
-##############################################################################################################
-#############################     3 methods for creating the "dataframe"    ################
-
-X = pd.DataFrame(output)
-#X = pd.DataFrame(output,index = [0])
-#X = pd.DataFrame({'Area': 100000, 'Room': 3, 'Parking': 1, 'Warehouse': 1, 'Elevator': 0, 'Address':Address},index = [0,1,2])
-
-predictionX = model.predict(X)
-
-if st.button('Predict'):
-    st.success(f'The price of this house is {predictionX}!') 
-   
-
+if __name__ == '__main__':
+    main()

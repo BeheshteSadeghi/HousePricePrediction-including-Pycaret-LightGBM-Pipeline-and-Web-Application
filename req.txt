@@ -1,6 +1,5 @@
-pandas
-seaborn
-scikit-learn
-lightgbm==3.3.0
-streamlit==1.11.1
-altair==4.0
+pandas>=2.2,<4
+numpy>=1.26,<3
+scikit-learn>=1.4,<2
+lightgbm>=4.0,<5
+streamlit>=1.35,<2

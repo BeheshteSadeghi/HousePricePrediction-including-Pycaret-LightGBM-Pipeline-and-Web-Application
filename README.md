@@ -1,19 +1,19 @@
-## House Price Prediction 
+# Tehran Housing Listing Price Estimator
 
-### I worked on Tehran houses dataset which had been extracted from Divar site.
+A LightGBM regression project with a Streamlit interface. Estimate an asking price using floor area, neighborhood, rooms, and amenities.
 
-### The focus of this project is on Data Cleaning, Data Analysis, Model Building (based on an insight from Pycaret tool) and local Deployment of the final result (based on streamlit).
+```sh
+python -m pip install -r req.txt
+python pricing.py
+streamlit run webApp.py
+```
 
-### After applying Pycaret over the cleaned data, top models are selected for hyper-parameter tuning:
-#### 1. Linear Regression
-#### 2. Ridge
-#### 3. Lasso
-#### 4. K Neighbors
-#### 5. Decision Tree
-#### 6. Random Forest
-#### 7. XGBoost
-#### 8. Light GBM
+The app trains and caches the pipeline using the bundled listing sample. The benchmark uses a separate 20% holdout and compares LightGBM with the training median. Neighborhood encoding is fit on the training split, and the model predicts log price before converting back to the original price units.
 
-### Then the performance of these models are compared together based on R2Score and RMSE factors.
-### The best model (LightGBM model) is then used to create a pipeline.
-### The pipeline is saved using joblib module and used as backend for Streamlit web application.
+The [listing dataset](housePrice.csv) was collected from Divar. The target is the supplied `Price` column. These are historical asking prices, and the holdout is a random sample of those listings. The estimate depends on how well a property is represented in that sample.
+
+[Exploration and model comparison](HousePricePrediciton_final.ipynb) · [Original preprocessing pipeline](PipelineModel.ipynb)
+
+## Example result
+
+In the bundled holdout, median absolute error was about **632 million** for LightGBM and **2.0 billion** for the training-median baseline, in the source price units.
